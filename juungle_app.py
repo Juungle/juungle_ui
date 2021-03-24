@@ -4,9 +4,9 @@ import os
 import requests
 from datetime import datetime
 from PyQt5.QtWidgets import QWidget, QComboBox, QApplication, QGridLayout
-from PyQt5.QtWidgets import QLabel, QCheckBox, QHBoxLayout, QTextBrowser
-from PyQt5.QtWidgets import QCompleter, QLineEdit
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtWidgets import QLabel, QCompleter, QLineEdit
+from PyQt5.QtWidgets import QGroupBox, QVBoxLayout
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 
 from juungle.nft import NFTs
@@ -31,72 +31,110 @@ class PyQtLayout(QWidget):
         self.id_names = {}
 
     def UI(self):
-        grid_image = QGridLayout()
+
+        vbox = QVBoxLayout()
 
         self.search_edit = QLineEdit()
         self.search_edit.setPlaceholderText('Search...')
         self.search_edit.returnPressed.connect(self.update_search)
-        grid_image.addWidget(self.search_edit, 0, 1)
+        vbox.addWidget(self.search_edit)
 
+        self.min_value = QLineEdit()
+        self.min_value.setPlaceholderText('Min value in BCH')
+        self.min_value.returnPressed.connect(self.update_search_price)
+        vbox.addWidget(self.min_value)
+
+        self.max_value = QLineEdit()
+        self.max_value.setPlaceholderText('Max value in BCH')
+        self.max_value.returnPressed.connect(self.update_search_price)
+        vbox.addWidget(self.max_value)
+
+        self.options = QComboBox(self)
+        self.options.addItem('All')
+        self.options.addItem('For Sale')
+        self.options.addItem('Sold/Not for sale')
+        self.options.currentIndexChanged.connect(self.update_options)
+        vbox.addWidget(self.options)
+
+        self.cb_nfts = QComboBox(self)
+        self.cb_nfts.currentIndexChanged.connect(self.update_image)
+        vbox.addWidget(self.cb_nfts)
+
+        filter_gb = QGroupBox('Filters')
+        filter_gb.setLayout(vbox)
+
+        vbox = QVBoxLayout()
         self.lbl_image = QLabel(self)
-        grid_image.addWidget(self.lbl_image, 1, 1)
+        vbox.addWidget(self.lbl_image)
+        image_gb = QGroupBox('Image')
+        image_gb.setLayout(vbox)
 
-        info_grid = QGridLayout()
+        vbox = QVBoxLayout()
         self.info_box = {
             "name": QLabel('NFTName', self),
             "price": QLabel('Price', self),
             "price_history": QLabel('', self),
         }
-        info_grid.addWidget(QLabel('Name', self), 0, 0)
-        info_grid.addWidget(self.info_box['name'], 0, 1)
-        info_grid.addWidget(QLabel('Price', self), 1, 0)
-        info_grid.addWidget(self.info_box['price'], 1, 1)
-        info_grid.addWidget(QLabel('Price history', self), 2, 0)
-        info_grid.addWidget(self.info_box['price_history'], 2, 1)
-        self.info_box['price_history'].setOpenExternalLinks(True)
+        vbox.addWidget(self.info_box['name'])
+        vbox.addWidget(self.info_box['price'])
+        vbox.addWidget(self.info_box['price_history'])
+        info_gb = QGroupBox('Info')
+        info_gb.setLayout(vbox)
 
-        cb_grid = QGridLayout()
-        box_layout = QHBoxLayout()
-        box_layout.addLayout(cb_grid)
-        box_layout.addLayout(grid_image)
-        box_layout.addLayout(info_grid)
+        main_grid = QGridLayout()
+        main_grid.addWidget(filter_gb, 0, 0)
+        main_grid.addWidget(image_gb, 0, 1)
+        main_grid.addWidget(info_gb, 0, 2)
 
-        self.combo = QComboBox(self)
-        self.combo.currentIndexChanged.connect(self.update_image)
-        cb_grid.addWidget(self.combo, 1, 0)
+        self.setLayout(main_grid)
 
-        self.options = QComboBox(self)
-        self.options.currentIndexChanged.connect(self.update_options)
-
-        self.options.addItem('All')
-        self.options.addItem('For Sale')
-        self.options.addItem('Sold/Not for sale')
-        cb_grid.addWidget(self.options, 0, 0)
-
-        self.setLayout(box_layout)
         title = ('Juungle.net UI v0.1 BETA '
                  '- Number of NFTs: {} '
                  '- Last update: {}').format(len(self.nfts),
                                              datetime.now())
         self.setWindowTitle(title)
+        self.update_options(0)
         self.show()
 
     def update_search(self):
-        self.combo.setCurrentText(self.search_edit.text())
+        self.cb_nfts.setCurrentText(self.search_edit.text())
         self.search_edit.clear()
 
+    def update_search_price(self):
+        self.update_options(self.options.currentIndex())
+
     def update_options(self, cb_index):
-        self.combo.clear()
+        self.cb_nfts.clear()
         self.id_names = {}
         self.search_edit.clear()
 
         if cb_index == 0:
             for nft in self.nfts.keys():
+                price_bch = self.nfts[nft][-1].price_bch
+                if self.min_value.text():
+                    if not price_bch or price_bch and \
+                            price_bch < float(self.min_value.text()):
+                        continue
+                if self.max_value.text():
+                    if not price_bch or price_bch and \
+                            price_bch > float(self.max_value.text()):
+                        continue
+
                 self.id_names[self.nfts[nft][0].name] = nft
 
         if cb_index == 1:
             for nft in self.nfts.keys():
+                price_bch = self.nfts[nft][-1].price_bch
                 if self.nfts[nft][-1].is_for_sale:
+                    if self.min_value.text():
+                        if not price_bch or price_bch and \
+                                price_bch < float(self.min_value.text()):
+                            continue
+                    if self.max_value.text():
+                        if not price_bch or price_bch and \
+                                price_bch > float(self.max_value.text()):
+                            continue
+
                     self.id_names[self.nfts[nft][0].name] = nft
 
         if cb_index == 2:
@@ -112,19 +150,19 @@ class PyQtLayout(QWidget):
         self.search_edit.setCompleter(completer)
 
         for i in names:
-            self.combo.addItem(i, self.id_names[i])
+            self.cb_nfts.addItem(i, self.id_names[i])
 
     def update_image(self, index):
         pixmap = QPixmap()
         nft = None
 
         for i in self.nfts.keys():
-            nft = self.nfts[i][0]
+            nft = self.nfts[i][-1]
             nfts = self.nfts[i]
-            if self.combo.itemData(index) == nft.token_id:
+            if self.cb_nfts.itemData(index) == nft.token_id:
                 break
         if not nft:
-            print(self.combo.currentText())
+            print(self.cb_nfts.currentText())
 
         image = None
         if not cache_exists(nft.token_id):

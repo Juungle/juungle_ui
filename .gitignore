@@ -51,6 +51,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 user-config.ini
+.vim/
 
 # Translations
 *.mo
