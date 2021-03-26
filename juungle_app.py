@@ -10,6 +10,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 
 from juungle.nft import NFTs
+from nft import NFTDB
 
 
 CACHE_DIR_PATH = '/tmp/juungle-cache'
@@ -26,7 +27,8 @@ def cache_exists(file_id):
 class PyQtLayout(QWidget):
     def __init__(self, nfts):
         super().__init__()
-        self.nfts = nfts
+        self.nfts = NFTDB(nfts)
+        self.info_nfts = nfts
         self.UI()
         self.id_names = {}
 
@@ -89,9 +91,7 @@ class PyQtLayout(QWidget):
         self.setLayout(main_grid)
 
         title = ('Juungle.net UI v0.1 BETA '
-                 '- Number of NFTs: {} '
-                 '- Last update: {}').format(len(self.nfts),
-                                             datetime.now())
+                 '- Last update: {}').format(datetime.now())
         self.setWindowTitle(title)
         self.update_options(0)
         self.show()
@@ -109,8 +109,10 @@ class PyQtLayout(QWidget):
         self.search_edit.clear()
 
         if cb_index == 0:
-            for nft in self.nfts.keys():
-                price_bch = self.nfts[nft][-1].price_bch
+            for nft in self.nfts.get_nfts():
+                prices_nft = self.nfts.get_nft_history(nft[1], True)
+                price_bch = prices_nft[1]
+
                 if self.min_value.text():
                     if not price_bch or price_bch and \
                             price_bch < float(self.min_value.text()):
@@ -120,27 +122,32 @@ class PyQtLayout(QWidget):
                             price_bch > float(self.max_value.text()):
                         continue
 
-                self.id_names[self.nfts[nft][0].name] = nft
+                self.id_names[nft[0]] = nft[1]
 
         if cb_index == 1:
-            for nft in self.nfts.keys():
-                price_bch = self.nfts[nft][-1].price_bch
-                if self.nfts[nft][-1].is_for_sale:
-                    if self.min_value.text():
-                        if not price_bch or price_bch and \
-                                price_bch < float(self.min_value.text()):
-                            continue
-                    if self.max_value.text():
-                        if not price_bch or price_bch and \
-                                price_bch > float(self.max_value.text()):
-                            continue
+            for nft in self.nfts.get_nfts():
+                if not nft[4]:
+                    continue
+                prices_nft = self.nfts.get_nft_history(nft[1], True)
+                price_bch = prices_nft[1]
 
-                    self.id_names[self.nfts[nft][0].name] = nft
+                if self.min_value.text():
+                    if not price_bch or price_bch and \
+                            price_bch < float(self.min_value.text()):
+                        continue
+
+                if self.max_value.text():
+                    if not price_bch or price_bch and \
+                            price_bch > float(self.max_value.text()):
+                        continue
+
+                self.id_names[nft[0]] = nft[1]
 
         if cb_index == 2:
-            for nft in self.nfts.keys():
-                if self.nfts[nft][-1].is_sold:
-                    self.id_names[self.nfts[nft][0].name] = nft
+            for nft in self.nfts.get_nfts():
+                if not nft[3]:
+                    continue
+                self.id_names[nft[0]] = nft[1]
 
         names = sorted(self.id_names.keys())
 
@@ -156,11 +163,11 @@ class PyQtLayout(QWidget):
         pixmap = QPixmap()
         nft = None
 
-        for i in self.nfts.keys():
-            nft = self.nfts[i][-1]
-            nfts = self.nfts[i]
-            if self.cb_nfts.itemData(index) == nft.token_id:
+        for i in self.info_nfts:
+            nft = self.info_nfts[i][-1]
+            if self.cb_nfts.itemData(index) == i:
                 break
+
         if not nft:
             print(self.cb_nfts.currentText())
 
@@ -187,14 +194,14 @@ class PyQtLayout(QWidget):
         self.info_box['price'].setText(price)
 
         msg = ''
-        for n in nfts:
-            if n.is_sold:
-                msg += ('Sold for {} BCH<br/>'.format(n.price_bch))
+        for n in self.nfts.get_nft_history(nft.token_id, order_by='asc'):
+            if n[2]:
+                msg += ('Sold for {} BCH<br/>'.format(n[1]))
 
-            if n.is_for_sale:
+            if n[3]:
                 msg += ('<a href="https://juungle.net/#/assets/{}">'
-                        '{}</a>{} BCH<br/>').format(n.token_id,
-                                                    'Click to buy for ', n.price_bch)
+                        '{}</a>{} BCH<br/>').format(nft.token_id,
+                                                    'Click to buy for ', n[1])
 
             self.info_box['price_history'].setText(msg)
 
