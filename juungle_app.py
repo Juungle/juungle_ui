@@ -204,6 +204,7 @@ class PyQtLayout(QWidget):
                                                     'Click to buy for ', n[1])
 
             self.info_box['price_history'].setText(msg)
+            self.info_box['price_history'].setOpenExternalLinks(True)
 
 
 def main():
