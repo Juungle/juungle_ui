@@ -185,15 +185,15 @@ class PyQtLayout(QWidget):
         pixmap.loadFromData(image)
 
         self.lbl_image.setPixmap(pixmap)
-        self.info_box['name'].setText(nft.name)
+        self.info_box['name'].setText('Name: {}'.format(nft.name))
 
         if nft.price_satoshis:
             price = '{} {}'.format(nft.price_bch, 'BCH')
         else:
             price = '-'
-        self.info_box['price'].setText(price)
+        self.info_box['price'].setText('Price: {}'.format(price))
 
-        msg = ''
+        msg = 'Price history: <br/><br/>'
         for n in self.nfts.get_nft_history(nft.token_id, order_by='asc'):
             if n[2]:
                 msg += ('Sold for {} BCH<br/>'.format(n[1]))
