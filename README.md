@@ -9,7 +9,10 @@ or download the files
 
 `$ wget https://raw.githubusercontent.com/Juungle/juungle_ui/main/juungle_app.py`
 
+`$ wget https://raw.githubusercontent.com/Juungle/juungle_ui/main/nft.py`
+
 `$ wget https://raw.githubusercontent.com/Juungle/juungle_ui/main/requrements.txt`
+
 
 place in a direcotry `juungle_ui`
 
