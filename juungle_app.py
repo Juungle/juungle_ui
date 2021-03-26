@@ -90,7 +90,7 @@ class PyQtLayout(QWidget):
 
         self.setLayout(main_grid)
 
-        title = ('Juungle.net UI v0.1 BETA '
+        title = ('Juungle.net UI v0.2 BETA '
                  '- Last update: {}').format(datetime.now())
         self.setWindowTitle(title)
         self.update_options(0)
