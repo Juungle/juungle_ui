@@ -14,7 +14,7 @@ from nft import NFTDB
 
 
 CACHE_DIR_PATH = '/tmp/juungle-cache'
-VERSION = '0.1'
+VERSION = '0.2'
 
 
 def cache_exists(file_id):
@@ -90,8 +90,9 @@ class PyQtLayout(QWidget):
 
         self.setLayout(main_grid)
 
-        title = ('Juungle.net UI v0.2 BETA '
-                 '- Last update: {}').format(datetime.now())
+        title = ('Juungle.net UI v{} BETA '
+                 '- Last update: {}').format(VERSION, datetime.now())
+
         self.setWindowTitle(title)
         self.update_options(0)
         self.show()
@@ -200,8 +201,9 @@ class PyQtLayout(QWidget):
 
             if n[3]:
                 msg += ('<a href="https://juungle.net/#/assets/{}">'
-                        '{}</a>{} BCH<br/>').format(nft.token_id,
-                                                    'Click to buy for ', n[1])
+                        '{}</a>{} BCH<br/>').format(
+                            nft.token_id,
+                            'Click to buy for ', n[1])
 
             self.info_box['price_history'].setText(msg)
             self.info_box['price_history'].setOpenExternalLinks(True)
