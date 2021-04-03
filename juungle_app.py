@@ -31,6 +31,10 @@ class PyQtLayout(QMainWindow):
         self.info_nfts = nfts
         self.initUI()
         self.id_names = {}
+        title = ('Juungle.net UI v{} BETA '
+                 '- Last update: {}').format(VERSION, datetime.now())
+
+        self.setWindowTitle(title)
 
     def initUI(self):
 
