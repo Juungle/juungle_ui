@@ -1,3 +1,2 @@
 juungle
 PyQt5
-sqlite3
