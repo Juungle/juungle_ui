@@ -14,7 +14,7 @@ from nft import NFTDB
 
 
 CACHE_DIR_PATH = '/tmp/juungle-cache'
-VERSION = '0.2.1'
+VERSION = '0.2.2'
 
 
 def cache_exists(file_id):
