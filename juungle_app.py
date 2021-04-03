@@ -90,8 +90,9 @@ class PyQtLayout(QMainWindow):
         vbox = QVBoxLayout()
         hbox = QHBoxLayout()
         l_label = QLabel('NFT name:')
-        l_label.adjustSize()
-        hbox.addWidget(l_label, 1)
+        hbox.addWidget(l_label)
+        self.lbl_n_nfts = QLabel('')
+        hbox.addWidget(self.lbl_n_nfts)
         self.cb_nfts = QComboBox(widget)
         self.cb_nfts.currentIndexChanged.connect(self.update_image)
         hbox.addWidget(self.cb_nfts)
@@ -187,6 +188,8 @@ class PyQtLayout(QMainWindow):
 
         for i in names:
             self.cb_nfts.addItem(i, self.id_names[i])
+
+        self.lbl_n_nfts.setText(str(len(names)) + ' listed')
 
     def update_image(self, index):
         pixmap = QPixmap()
