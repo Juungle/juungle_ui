@@ -1,19 +1,27 @@
+"Module Juungle App"
 import sys
 import os
 
-import requests
 from datetime import datetime
-from PyQt5.QtWidgets import QMainWindow, QComboBox, QApplication, QGridLayout
-from PyQt5.QtWidgets import QLabel, QCompleter, QLineEdit, QWidget
-from PyQt5.QtWidgets import QGroupBox, QVBoxLayout, QHBoxLayout
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt
+import requests
+import tempfile
+from PyQt5.QtWidgets import QMainWindow, QComboBox  # pylint: disable= no-name-in-module
+from PyQt5.QtWidgets import QApplication, QGridLayout  # pylint: disable= no-name-in-module
 
-from juungle.nft import NFTs
+from PyQt5.QtWidgets import QLabel, QCompleter, QLineEdit, QWidget  # pylint: disable= no-name-in-module
+
+from PyQt5.QtWidgets import QGroupBox, QVBoxLayout, QHBoxLayout  # pylint: disable= no-name-in-module
+
+from PyQt5.QtGui import QPixmap  # pylint: disable= no-name-in-module
+
+from PyQt5.QtCore import Qt  # pylint: disable= no-name-in-module
+
+
 from nft import NFTDB
+from juungle.nft import NFTs
 
 
-CACHE_DIR_PATH = '/tmp/juungle-cache'
+CACHE_DIR_PATH = '{}/juungle-cache'.format(tempfile.gettempdir())
 VERSION = '0.4.0'
 
 
