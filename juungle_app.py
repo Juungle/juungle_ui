@@ -5,7 +5,7 @@ import requests
 from datetime import datetime
 from PyQt5.QtWidgets import QMainWindow, QComboBox, QApplication, QGridLayout
 from PyQt5.QtWidgets import QLabel, QCompleter, QLineEdit, QWidget
-from PyQt5.QtWidgets import QGroupBox, QVBoxLayout
+from PyQt5.QtWidgets import QGroupBox, QVBoxLayout, QHBoxLayout
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 
@@ -46,7 +46,7 @@ class PyQtLayout(QMainWindow):
         vbox = QVBoxLayout()
 
         self.search_edit = QLineEdit()
-        self.search_edit.setPlaceholderText('Search...')
+        self.search_edit.setPlaceholderText('Search by name...')
         self.search_edit.returnPressed.connect(self.update_search)
         vbox.addWidget(self.search_edit)
 
@@ -60,28 +60,42 @@ class PyQtLayout(QMainWindow):
         self.max_value.returnPressed.connect(self.update_search_price)
         vbox.addWidget(self.max_value)
 
+        hbox = QHBoxLayout()
+        l_label = QLabel('Types')
+        l_label.adjustSize()
+        hbox.addWidget(l_label)
         self.own_nft = QComboBox(widget)
         self.own_nft.addItem('All', None)
         self.own_nft.addItem('Only mine', True)
-        self.own_nft.addItem('No mine', False)
+        self.own_nft.addItem('Not mine', False)
         self.own_nft.currentIndexChanged.connect(self.update_options)
-        vbox.addWidget(self.own_nft)
+        hbox.addWidget(self.own_nft)
+        vbox.addLayout(hbox)
 
+        hbox = QHBoxLayout()
+        l_label = QLabel('For sale?')
+        l_label.adjustSize()
+        hbox.addWidget(l_label, 1)
         self.options = QComboBox(widget)
         self.options.addItem('All')
         self.options.addItem('For Sale')
         self.options.addItem('Sold/Not for sale')
         self.options.currentIndexChanged.connect(self.update_options)
-        vbox.addWidget(self.options)
-
-        self.cb_nfts = QComboBox(widget)
-        self.cb_nfts.currentIndexChanged.connect(self.update_image)
-        vbox.addWidget(self.cb_nfts)
+        hbox.addWidget(self.options)
+        vbox.addLayout(hbox)
 
         filter_gb = QGroupBox('Filters')
         filter_gb.setLayout(vbox)
 
         vbox = QVBoxLayout()
+        hbox = QHBoxLayout()
+        l_label = QLabel('NFT name:')
+        l_label.adjustSize()
+        hbox.addWidget(l_label, 1)
+        self.cb_nfts = QComboBox(widget)
+        self.cb_nfts.currentIndexChanged.connect(self.update_image)
+        hbox.addWidget(self.cb_nfts)
+        vbox.addLayout(hbox)
         self.lbl_image = QLabel(widget)
         vbox.addWidget(self.lbl_image)
         image_gb = QGroupBox('Image')
