@@ -40,8 +40,8 @@ class PyQtLayout(QMainWindow):
 
         widget = QWidget()
 
-        main_menu = self.menuBar()
-        main_menu.addMenu('Options')
+        # main_menu = self.menuBar()
+        # main_menu.addMenu('Options')
 
         vbox = QVBoxLayout()
 
