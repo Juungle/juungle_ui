@@ -22,7 +22,7 @@ from juungle.nft import NFTs
 
 
 CACHE_DIR_PATH = '{}/juungle-cache'.format(tempfile.gettempdir())
-VERSION = '0.4.0'
+VERSION = '0.4.1'
 
 
 def cache_exists(file_id):
