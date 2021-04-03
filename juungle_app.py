@@ -60,6 +60,13 @@ class PyQtLayout(QMainWindow):
         self.max_value.returnPressed.connect(self.update_search_price)
         vbox.addWidget(self.max_value)
 
+        self.own_nft = QComboBox(widget)
+        self.own_nft.addItem('All', None)
+        self.own_nft.addItem('Only mine', True)
+        self.own_nft.addItem('No mine', False)
+        self.own_nft.currentIndexChanged.connect(self.update_options)
+        vbox.addWidget(self.own_nft)
+
         self.options = QComboBox(widget)
         self.options.addItem('All')
         self.options.addItem('For Sale')
@@ -112,13 +119,14 @@ class PyQtLayout(QMainWindow):
     def update_search_price(self):
         self.update_options(self.options.currentIndex())
 
-    def update_options(self, cb_index):
+    def update_options(self, _):
         self.cb_nfts.clear()
         self.id_names = {}
         self.search_edit.clear()
+        cb_index = self.options.currentIndex()
 
-        if cb_index == 0:
-            for nft in self.nfts.get_nfts():
+        for nft in self.nfts.get_nfts(mine=self.own_nft.currentData()):
+            if cb_index == 0:
                 prices_nft = self.nfts.get_nft_history(nft[1], True)
                 price_bch = prices_nft[1]
 
@@ -133,8 +141,7 @@ class PyQtLayout(QMainWindow):
 
                 self.id_names[nft[0]] = nft[1]
 
-        if cb_index == 1:
-            for nft in self.nfts.get_nfts():
+            if cb_index == 1:
                 if not nft[4]:
                     continue
                 prices_nft = self.nfts.get_nft_history(nft[1], True)
@@ -152,8 +159,7 @@ class PyQtLayout(QMainWindow):
 
                 self.id_names[nft[0]] = nft[1]
 
-        if cb_index == 2:
-            for nft in self.nfts.get_nfts():
+            if cb_index == 2:
                 if not nft[3]:
                     continue
                 self.id_names[nft[0]] = nft[1]

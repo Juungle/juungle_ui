@@ -1,4 +1,5 @@
 import sqlite3
+from juungle.user import User
 
 CON = sqlite3.connect(':memory:')
 CON.isolation_level = None
@@ -7,6 +8,7 @@ SCHEMA = [(
     'CREATE TABLE nfts '
     '(name text'
     ',token_id text'
+    ',user_id'
     ',price number NULL'
     ',price_bch number NULL'
     ',is_sold boolean '
@@ -31,13 +33,15 @@ class NFTDB():
         for nft in nfts_groups:
             sql = (
                 "INSERT INTO nfts "
-                "(name, token_id, price, price_bch, is_sold, is_for_sale) "
-                "values (?, ?, ?, ?, ?, ?)"
+                "(name, token_id, user_id, price, price_bch, "
+                "is_sold, is_for_sale) "
+                "values (?, ?, ?, ?, ?, ?, ?)"
             )
             try:
                 self.db_cursor.execute(sql, (
                     nfts_groups[nft][-1].name,
                     nft,
+                    nfts_groups[nft][-1].user_id,
                     nfts_groups[nft][-1].price_satoshis,
                     nfts_groups[nft][-1].price_bch,
                     nfts_groups[nft][-1].is_sold,
@@ -64,11 +68,20 @@ class NFTDB():
                     print(sql)
                     raise
 
-    def get_nfts(self):
-        sql = (
-            'select name, token_id, price_bch, is_sold, is_for_sale'
-            ' from nfts order by name'
-        )
+    def get_nfts(self, mine=None):
+        sql = 'select name, token_id, price_bch, is_sold, is_for_sale'
+        sql += ' from nfts '
+
+        if mine is not None:
+            user = User()
+            sql += ' WHERE '
+            if mine:
+                sql += 'user_id = {}'.format(user.user_id)
+            else:
+                sql += 'user_id <> {}'.format(user.user_id)
+
+        sql += ' order by name'
+
         return self.db_cursor.execute(sql).fetchall()
 
     def get_nft_history(self, token_id, only_one=False, is_sold=False,
