@@ -200,7 +200,9 @@ class PyQtLayout(QMainWindow):
         for i in names:
             self.cb_nfts.addItem(i, self.id_names[i])
 
-        self.lbl_n_nfts.setText(str(len(names)) + ' listed')
+        msg = "1/{} listed".format(len(names))
+        self.lbl_n_nfts.setText(msg)
+        self.cb_nfts.setFocus()
 
     def update_image(self, index):
         pixmap = QPixmap()
@@ -249,6 +251,9 @@ class PyQtLayout(QMainWindow):
 
             self.info_box['price_history'].setText(msg)
             self.info_box['price_history'].setOpenExternalLinks(True)
+
+        msg = "{}/{} listed".format(index, self.cb_nfts.count())
+        self.lbl_n_nfts.setText(msg)
 
 
 def main():
