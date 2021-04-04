@@ -3,8 +3,8 @@ import sys
 import os
 
 from datetime import datetime
-import requests
 import tempfile
+import requests
 from PyQt5.QtWidgets import QMainWindow, QComboBox  # pylint: disable= no-name-in-module
 from PyQt5.QtWidgets import QApplication, QGridLayout  # pylint: disable= no-name-in-module
 
@@ -18,7 +18,7 @@ from PyQt5.QtCore import Qt  # pylint: disable= no-name-in-module
 
 
 from nft import NFTDB
-from juungle.nft import NFTs
+from juungle.nft import NFTs  # pylint: disable=import-error
 
 
 CACHE_DIR_PATH = '{}/juungle-cache'.format(tempfile.gettempdir())
@@ -26,6 +26,9 @@ VERSION = '0.4.1'
 
 
 def cache_exists(file_id):
+    """
+    Check if the file already exists.
+    """
     if not os.path.isdir(CACHE_DIR_PATH):
         os.mkdir(CACHE_DIR_PATH)
 
