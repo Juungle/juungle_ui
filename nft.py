@@ -15,6 +15,8 @@ SCHEMA = [(
     ',price_bch number NULL'
     ',is_sold boolean '
     ',is_for_sale boolean'
+    ',group_id text'
+    ',token_symbol text'
     '); '),
     ('CREATE TABLE nft_info '
      '(token_id text'
@@ -42,7 +44,9 @@ class NFTDB():
                 nfts_groups[nft][-1].price_satoshis,
                 nfts_groups[nft][-1].price_bch,
                 nfts_groups[nft][-1].is_sold,
-                nfts_groups[nft][-1].is_for_sale
+                nfts_groups[nft][-1].is_for_sale,
+                nfts_groups[nft][-1].group_tokenid,
+                nfts_groups[nft][-1].token_symbol
             ))
             for nft_info in nfts_groups[nft]:
                 l_nft_info.append((
@@ -56,8 +60,8 @@ class NFTDB():
         sql = (
             "INSERT INTO nfts "
             "(name, token_id, user_id, price, price_bch, "
-            "is_sold, is_for_sale) "
-            "values (?, ?, ?, ?, ?, ?, ?)"
+            "is_sold, is_for_sale, group_id, token_symbol) "
+            "values (?, ?, ?, ?, ?, ?, ?, ?, ?)"
         )
         try:
             self.db_cursor.executemany(sql, l_nft)
@@ -67,7 +71,8 @@ class NFTDB():
 
         sql = (
             "INSERT INTO nft_info "
-            "(token_id, price, price_bch, is_sold, is_for_sale)"
+            "(token_id, price, price_bch, is_sold, is_for_sale "
+            ")"
             " values "
             "(?, ?, ?, ?, ?)"
         )
@@ -77,17 +82,30 @@ class NFTDB():
             print(sql)
             raise
 
-    def get_nfts(self, mine=None):
+    def get_groups(self):
+        sql = (
+            'SELECT token_symbol, group_id from '
+            'nfts group by token_symbol '
+            ' order by token_symbol')
+
+        return self.db_cursor.execute(sql).fetchall()
+
+    def get_nfts(self, mine=None, group_id=None):
         sql = 'select name, token_id, price_bch, is_sold, is_for_sale'
         sql += ' from nfts '
 
+        if mine is not None or group_id is not None:
+            sql += ' WHERE 1'
+
         if mine is not None:
             user = User()
-            sql += ' WHERE '
             if mine:
-                sql += 'user_id = {}'.format(user.user_id)
+                sql += ' AND user_id = {}'.format(user.user_id)
             else:
-                sql += 'user_id <> {}'.format(user.user_id)
+                sql += ' AND user_id <> {}'.format(user.user_id)
+
+        if group_id:
+            sql += " AND group_id = '{}'".format(group_id)
 
         sql += ' order by name'
 
