@@ -22,7 +22,7 @@ from juungle.nft import NFTs  # pylint: disable=import-error
 
 
 CACHE_DIR_PATH = '{}/juungle-cache'.format(tempfile.gettempdir())
-VERSION = '0.4.2'
+VERSION = '0.5.0'
 
 
 def cache_exists(file_id):
