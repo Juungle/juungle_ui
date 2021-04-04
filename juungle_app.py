@@ -95,6 +95,15 @@ class PyQtLayout(QMainWindow):
         hbox.addWidget(self.options)
         vbox.addLayout(hbox)
 
+        hbox = QHBoxLayout()
+        l_label = QLabel('NFT Group')
+        hbox.addWidget(l_label, 1)
+        self.cb_group = QComboBox(widget)
+        self.update_group_cb()
+        self.cb_group.currentIndexChanged.connect(self.update_options)
+        hbox.addWidget(self.cb_group)
+        vbox.addLayout(hbox)
+
         filter_gb = QGroupBox('Filters')
         filter_gb.setLayout(vbox)
 
@@ -108,6 +117,7 @@ class PyQtLayout(QMainWindow):
         self.cb_nfts.currentIndexChanged.connect(self.update_image)
         hbox.addWidget(self.cb_nfts)
         vbox.addLayout(hbox)
+
         self.lbl_image = QLabel(widget)
         vbox.addWidget(self.lbl_image)
         image_gb = QGroupBox('Image')
@@ -145,13 +155,20 @@ class PyQtLayout(QMainWindow):
     def update_search_price(self):
         self.update_options(self.options.currentIndex())
 
+    def update_group_cb(self):
+        self.cb_group.clear()
+        self.cb_group.addItem('All', None)
+        for group in self.nfts.get_groups():
+            self.cb_group.addItem(group[0], group[1])
+
     def update_options(self, _):
         self.cb_nfts.clear()
         self.id_names = {}
         self.search_edit.clear()
         cb_index = self.options.currentIndex()
 
-        for nft in self.nfts.get_nfts(mine=self.own_nft.currentData()):
+        for nft in self.nfts.get_nfts(mine=self.own_nft.currentData(),
+                                      group_id=self.cb_group.currentData()):
             if cb_index == 0:
                 prices_nft = self.nfts.get_nft_history(nft[1], True)
                 price_bch = prices_nft[1]
@@ -229,7 +246,12 @@ class PyQtLayout(QMainWindow):
 
         pixmap.loadFromData(image)
 
-        self.lbl_image.setPixmap(pixmap)
+        img_height = 500
+        if pixmap.height() > img_height:
+            self.lbl_image.setPixmap(pixmap.scaledToHeight(img_height))
+        else:
+            self.lbl_image.setPixmap(pixmap)
+
         self.info_box['name'].setText('Name: {}'.format(nft.name))
 
         if nft.price_satoshis:
@@ -259,7 +281,6 @@ class PyQtLayout(QMainWindow):
 def main():
     app = QApplication([])
     nfts = NFTs()
-    nfts.token_group = 'WAIFU'
     nfts.get_nfts()
     ex = PyQtLayout(nfts.group_ids)
     sys.exit(app.exec_())
