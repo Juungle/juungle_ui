@@ -131,6 +131,7 @@ class PyQtLayout(QMainWindow):
             "price": QLabel('Price', widget),
             "price_history": QLabel('', widget),
         }
+        self.info_box['price_history'].setFixedWidth(200)
 
         vbox.addWidget(self.info_box['name'])
         vbox.addWidget(self.info_box['price'])
@@ -249,10 +250,11 @@ class PyQtLayout(QMainWindow):
         pixmap.loadFromData(image)
 
         img_height = 500
+        pixmap_resized = pixmap
         if pixmap.height() > img_height:
-            self.lbl_image.setPixmap(pixmap.scaledToHeight(img_height))
-        else:
-            self.lbl_image.setPixmap(pixmap)
+            pixmap_resized = pixmap.scaledToHeight(img_height)
+
+        self.lbl_image.setPixmap(pixmap_resized)
 
         self.info_box['name'].setText('Name: {}'.format(nft.name))
 
@@ -276,6 +278,7 @@ class PyQtLayout(QMainWindow):
             self.info_box['price_history'].setText(msg)
             self.info_box['price_history'].setOpenExternalLinks(True)
 
+        self.cb_nfts.setFixedWidth(300)
         msg = "{}/{} listed".format(index, self.cb_nfts.count())
         self.lbl_n_nfts.setText(msg)
 
