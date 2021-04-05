@@ -48,7 +48,7 @@ class PyQtLayout(QMainWindow):
         self.setWindowTitle(title)
 
     def initUI(self):
-
+        """initUI"""
         widget = QWidget()
 
         # main_menu = self.menuBar()
@@ -71,33 +71,35 @@ class PyQtLayout(QMainWindow):
         self.max_value.returnPressed.connect(self.update_search_price)
         vbox.addWidget(self.max_value)
 
-        hbox = QHBoxLayout()
-        l_label = QLabel('Types')
-        l_label.adjustSize()
-        hbox.addWidget(l_label)
-        self.own_nft = QComboBox(widget)
-        self.own_nft.addItem('All', None)
-        self.own_nft.addItem('Only mine', True)
-        self.own_nft.addItem('Not mine', False)
-        self.own_nft.currentIndexChanged.connect(self.update_options)
-        hbox.addWidget(self.own_nft)
+        def add_combo(label, items):
+            hbox = QHBoxLayout()
+            l_label = QLabel(label)
+            l_label.adjustSize()
+            hbox.addWidget(l_label)
+            combo = QComboBox(widget)
+
+            for i in items:
+                combo.addItem(i[0], i[1])
+            combo.currentIndexChanged.connect(self.update_options)
+            hbox.addWidget(combo)
+
+            return hbox, combo
+
+        hbox, self.own_nft = add_combo(
+            'Types',
+            [('All', None), ('Only mine', True), ('Not mine', False)]
+        )
         vbox.addLayout(hbox)
 
-        hbox = QHBoxLayout()
-        l_label = QLabel('For sale?')
-        l_label.adjustSize()
-        hbox.addWidget(l_label, 1)
-        self.options = QComboBox(widget)
-        self.options.addItem('All')
-        self.options.addItem('For Sale')
-        self.options.addItem('Sold/Not for sale')
-        self.options.currentIndexChanged.connect(self.update_options)
-        hbox.addWidget(self.options)
+        hbox, self.options = add_combo(
+            'For sale?',
+            [('All', None), ('For Sale', None), ('Sold/Not for sale', None)]
+        )
         vbox.addLayout(hbox)
 
         hbox = QHBoxLayout()
         l_label = QLabel('NFT Group')
-        hbox.addWidget(l_label, 1)
+        hbox.addWidget(l_label)
         self.cb_group = QComboBox(widget)
         self.update_group_cb()
         self.cb_group.currentIndexChanged.connect(self.update_options)
