@@ -23,7 +23,7 @@ from juungle import __version__ as juungle_version
 
 
 CACHE_DIR_PATH = '{}/juungle-cache'.format(tempfile.gettempdir())
-VERSION = '0.5.1'
+VERSION = '0.5.2'
 
 MIN_JUUNGLE_VERSION = '0.6.2'
 
