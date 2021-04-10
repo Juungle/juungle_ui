@@ -19,10 +19,25 @@ from PyQt5.QtCore import Qt  # pylint: disable= no-name-in-module
 
 from nft import NFTDB
 from juungle.nft import NFTs  # pylint: disable=import-error
+from juungle import __version__ as juungle_version
 
 
 CACHE_DIR_PATH = '{}/juungle-cache'.format(tempfile.gettempdir())
-VERSION = '0.5.0'
+VERSION = '0.5.1'
+
+MIN_JUUNGLE_VERSION = '0.6.2'
+
+
+def version_tuple(version):
+    """Convert string into version"""
+    return tuple(map(int, version.split('.')))
+
+
+if version_tuple(juungle_version) <= version_tuple(MIN_JUUNGLE_VERSION):
+    MSG = ('Juungle package should be higher than {}. Package version is'
+           ' {}. \nRun "python3 -m pip install -U juungle"')
+    print(MSG.format(MIN_JUUNGLE_VERSION, juungle_version))
+    sys.exit(1)
 
 
 def cache_exists(file_id):
@@ -48,7 +63,7 @@ class PyQtLayout(QMainWindow):
         self.setWindowTitle(title)
 
     def initUI(self):
-
+        """initUI"""
         widget = QWidget()
 
         # main_menu = self.menuBar()
@@ -71,33 +86,35 @@ class PyQtLayout(QMainWindow):
         self.max_value.returnPressed.connect(self.update_search_price)
         vbox.addWidget(self.max_value)
 
-        hbox = QHBoxLayout()
-        l_label = QLabel('Types')
-        l_label.adjustSize()
-        hbox.addWidget(l_label)
-        self.own_nft = QComboBox(widget)
-        self.own_nft.addItem('All', None)
-        self.own_nft.addItem('Only mine', True)
-        self.own_nft.addItem('Not mine', False)
-        self.own_nft.currentIndexChanged.connect(self.update_options)
-        hbox.addWidget(self.own_nft)
+        def add_combo(label, items):
+            hbox = QHBoxLayout()
+            l_label = QLabel(label)
+            l_label.adjustSize()
+            hbox.addWidget(l_label)
+            combo = QComboBox(widget)
+
+            for i in items:
+                combo.addItem(i[0], i[1])
+            combo.currentIndexChanged.connect(self.update_options)
+            hbox.addWidget(combo)
+
+            return hbox, combo
+
+        hbox, self.own_nft = add_combo(
+            'Types',
+            [('All', None), ('Only mine', True), ('Not mine', False)]
+        )
         vbox.addLayout(hbox)
 
-        hbox = QHBoxLayout()
-        l_label = QLabel('For sale?')
-        l_label.adjustSize()
-        hbox.addWidget(l_label, 1)
-        self.options = QComboBox(widget)
-        self.options.addItem('All')
-        self.options.addItem('For Sale')
-        self.options.addItem('Sold/Not for sale')
-        self.options.currentIndexChanged.connect(self.update_options)
-        hbox.addWidget(self.options)
+        hbox, self.options = add_combo(
+            'For sale?',
+            [('All', None), ('For Sale', None), ('Sold/Not for sale', None)]
+        )
         vbox.addLayout(hbox)
 
         hbox = QHBoxLayout()
         l_label = QLabel('NFT Group')
-        hbox.addWidget(l_label, 1)
+        hbox.addWidget(l_label)
         self.cb_group = QComboBox(widget)
         self.update_group_cb()
         self.cb_group.currentIndexChanged.connect(self.update_options)
@@ -129,6 +146,7 @@ class PyQtLayout(QMainWindow):
             "price": QLabel('Price', widget),
             "price_history": QLabel('', widget),
         }
+        self.info_box['price_history'].setFixedWidth(200)
 
         vbox.addWidget(self.info_box['name'])
         vbox.addWidget(self.info_box['price'])
@@ -247,10 +265,11 @@ class PyQtLayout(QMainWindow):
         pixmap.loadFromData(image)
 
         img_height = 500
+        pixmap_resized = pixmap
         if pixmap.height() > img_height:
-            self.lbl_image.setPixmap(pixmap.scaledToHeight(img_height))
-        else:
-            self.lbl_image.setPixmap(pixmap)
+            pixmap_resized = pixmap.scaledToHeight(img_height)
+
+        self.lbl_image.setPixmap(pixmap_resized)
 
         self.info_box['name'].setText('Name: {}'.format(nft.name))
 
@@ -274,6 +293,7 @@ class PyQtLayout(QMainWindow):
             self.info_box['price_history'].setText(msg)
             self.info_box['price_history'].setOpenExternalLinks(True)
 
+        self.cb_nfts.setFixedWidth(300)
         msg = "{}/{} listed".format(index, self.cb_nfts.count())
         self.lbl_n_nfts.setText(msg)
 
