@@ -33,7 +33,7 @@ def version_tuple(version):
     return tuple(map(int, version.split('.')))
 
 
-if version_tuple(juungle_version) <= version_tuple(MIN_JUUNGLE_VERSION):
+if version_tuple(juungle_version) < version_tuple(MIN_JUUNGLE_VERSION):
     MSG = ('Juungle package should be higher than {}. Package version is'
            ' {}. \nRun "python3 -m pip install -U juungle"')
     print(MSG.format(MIN_JUUNGLE_VERSION, juungle_version))
