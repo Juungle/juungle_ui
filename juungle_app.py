@@ -23,7 +23,7 @@ from juungle import __version__ as juungle_version
 
 
 CACHE_DIR_PATH = '{}/juungle-cache'.format(tempfile.gettempdir())
-VERSION = '0.5.0'
+VERSION = '0.5.1'
 
 MIN_JUUNGLE_VERSION = '0.6.2'
 
@@ -33,7 +33,7 @@ def version_tuple(version):
     return tuple(map(int, version.split('.')))
 
 
-if version_tuple(juungle_version) < version_tuple(MIN_JUUNGLE_VERSION):
+if version_tuple(juungle_version) <= version_tuple(MIN_JUUNGLE_VERSION):
     MSG = ('Juungle package should be higher than {}. Package version is'
            ' {}. \nRun "python3 -m pip install -U juungle"')
     print(MSG.format(MIN_JUUNGLE_VERSION, juungle_version))
