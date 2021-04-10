@@ -19,10 +19,25 @@ from PyQt5.QtCore import Qt  # pylint: disable= no-name-in-module
 
 from nft import NFTDB
 from juungle.nft import NFTs  # pylint: disable=import-error
+from juungle import __version__ as juungle_version
 
 
 CACHE_DIR_PATH = '{}/juungle-cache'.format(tempfile.gettempdir())
 VERSION = '0.5.0'
+
+MIN_JUUNGLE_VERSION = '0.6.2'
+
+
+def version_tuple(version):
+    """Convert string into version"""
+    return tuple(map(int, version.split('.')))
+
+
+if version_tuple(juungle_version) < version_tuple(MIN_JUUNGLE_VERSION):
+    MSG = ('Juungle package should be higher than {}. Package version is'
+           ' {}. \nRun "python3 -m pip install -U juungle"')
+    print(MSG.format(MIN_JUUNGLE_VERSION, juungle_version))
+    sys.exit(1)
 
 
 def cache_exists(file_id):
