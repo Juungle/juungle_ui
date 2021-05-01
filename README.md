@@ -28,7 +28,3 @@ LOGIN_PASSWORD="password"
 ## Running
 `$ python juungle_app.py`
 
-## Options
-* All - Show all nfts (temporary WAIFU only)
-* For Sale - All nfts that are for sale
-* Sold - All nfts that have been sold or are not for sale
