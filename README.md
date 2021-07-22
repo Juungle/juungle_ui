@@ -21,6 +21,7 @@ place in a directory `juungle_ui`
 Create a file `user-config.ini` with juungle.net credentials
 in the same directory of the file:
 ```
+[DEFAULT]
 LOGIN_USERNAME="username@email"
 LOGIN_PASSWORD="password"
 ```
